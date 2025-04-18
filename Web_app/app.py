@@ -45,10 +45,10 @@ def load_data_from_rds():
     try:
         # connect to mysql rds instance
         conn = pymysql.connect(
-            host='your-rds-endpoint',       # replace with your actual rds endpoint
-            user='your-db-username',
-            password='your-db-password',
-            database='your-db-name'
+            host='sales-cleaned-db.cjywqmyqm23a.us-east-2.rds.amazonaws.com',       # replace with your actual rds endpoint
+            user='admin',
+            password='ds4300finalproject',
+            database='sales-cleaned-db'
         )
         # read data from table into pandas dataframe
         df = pd.read_sql("SELECT * FROM sales_data", conn)
@@ -58,25 +58,21 @@ def load_data_from_rds():
         st.error(f"failed to connect to rds: {e}")
         return pd.DataFrame()
 
+
 # if user clicks the load dashboard button, show charts
 if st.button("load dashboard"):
     data = load_data_from_rds()
     if not data.empty:
-        # convert date column to datetime format
-        data['date'] = pd.to_datetime(data['date'])
+        st.subheader("📦 Total Number of Products by Category")
+        category_counts = data['category'].value_counts()
+        st.bar_chart(category_counts)
 
-        # group data by date and calculate total sales per day
-        trend = data.groupby(data['date'].dt.date)['price'].sum()
+        st.subheader("💸 Average Discount Percentage by Category")
+        avg_discount = data.groupby('category')['discount_percentage'].mean().sort_values(ascending=False)
+        st.bar_chart(avg_discount)
 
-        # show line chart of daily sales
-        st.subheader("sales over time")
-        st.line_chart(trend)
-
-        # group by product name and get top 5 selling products by quantity
-        top_products = data.groupby('product_name')['quantity'].sum().sort_values(ascending=False).head(5)
-
-        # show bar chart of top products
-        st.subheader("top selling products")
-        st.bar_chart(top_products)
+        st.subheader("⭐ Average Rating by Category")
+        avg_rating = data.groupby('category')['rating'].mean().sort_values(ascending=False)
+        st.line_chart(avg_rating)
     else:
         st.warning("no data available.")
