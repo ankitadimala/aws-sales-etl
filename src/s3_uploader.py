@@ -12,11 +12,11 @@ from dotenv import load_dotenv
 # The folder where source files live
 DATA_FOLDER = "amazon_data_json"
 # How frequently to upload a file, in seconds
-UPLOAD_INTERVAL = 3
+UPLOAD_INTERVAL = int(input("Enter Upload Interval (in seconds): "))
 # Total number of uploads to perform
-NUM_UPLOADS = 4
+NUM_UPLOADS = int(input("Enter Number of Uploads: "))
 # The name of the s3 bucket you're uploading to
-S3_BUCKET_NAME = "ds4300rawdata"
+#S3_BUCKET_NAME = "ds4300rawdata"
 
 
 # Load the values from .env into dictionary
@@ -54,6 +54,9 @@ def main():
     # Load AWS credentials from .env
     aws_credentials = load_env_variables()
 
+    # Random or All Files
+    upload_method = input("Random or All Files? (R/A): ").strip().lower()
+
     # Validate required environment variables
     if not aws_credentials["aws_access_key_id"]:
         raise ValueError("No AWS Access key id set")
@@ -73,23 +76,41 @@ def main():
     )
 
     print(
-        f"Starting S3 uploader. Will upload a random file every {UPLOAD_INTERVAL} seconds."
+        f"Starting S3 uploader. Will upload a file every {UPLOAD_INTERVAL} seconds."
     )
 
-    count_uploads = 0
+    if upload_method == "a":
+        # Upload all files once
+        print("📦 Uploading all JSON files from the folder...")
+        json_files = sorted(Path(DATA_FOLDER).glob("*.json"))
+        
+        for file_path in json_files:
+            try:
+                upload_to_s3(s3_client, file_path, aws_credentials["s3_bucket_name"])
+                time.sleep(UPLOAD_INTERVAL)
+            except Exception as e:
+                print(f"An error occurred: {str(e)}")
+                time.sleep(UPLOAD_INTERVAL)
 
-    while count_uploads < NUM_UPLOADS:
-        count_uploads += 1
-        try:
-            file_path = get_random_json_file(DATA_FOLDER)
-            upload_to_s3(s3_client, file_path, aws_credentials["s3_bucket_name"])
+        print("Finished uploading all files.")
 
-            # Wait for the specified interval
-            time.sleep(UPLOAD_INTERVAL)
-
-        except Exception as e:
-            print(f"An error occurred: {str(e)}")
-            time.sleep(UPLOAD_INTERVAL)  # Wait before retrying
+    elif upload_method == "r":
+        # Upload random files
+        print(
+            f"Uploading {NUM_UPLOADS} random files from the folder, one every {UPLOAD_INTERVAL} seconds..."
+        )
+        count_uploads = 0
+        while count_uploads < NUM_UPLOADS:
+            try:
+                file_path = get_random_json_file(DATA_FOLDER)
+                upload_to_s3(s3_client, file_path, aws_credentials["s3_bucket_name"])
+                count_uploads += 1
+                time.sleep(UPLOAD_INTERVAL)
+            except Exception as e:
+                print(f"An error occurred: {str(e)}")
+                time.sleep(UPLOAD_INTERVAL)
+    else:
+        print("Invalid choice. Please enter 'R' for random or 'A' for all.")
 
 
 if __name__ == "__main__":
