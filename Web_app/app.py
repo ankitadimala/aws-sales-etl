@@ -48,7 +48,7 @@ def load_data_from_rds():
             host='sales-cleaned-db.cjywqmyqm23a.us-east-2.rds.amazonaws.com',       # replace with your actual rds endpoint
             user='admin',
             password='ds4300finalproject',
-            database='sales-cleaned-db'
+            database='salesdb'
         )
         # read data from table into pandas dataframe
         df = pd.read_sql("SELECT * FROM products_cleaned", conn)
