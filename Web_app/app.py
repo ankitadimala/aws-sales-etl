@@ -5,6 +5,59 @@ import boto3
 import pymysql
 import json
 
+def set_fun_theme():
+    st.markdown(
+        """
+        <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap');
+
+        html, body, [class*="css"] {
+            font-family: 'Fredoka', sans-serif;
+            color: #2e2e2e;
+        }
+
+        .stApp {
+            background: linear-gradient(to bottom right, #f6d365, #fda085);
+            background-attachment: fixed;
+        }
+
+        /* Button styling */
+        .stButton > button {
+            background-color: #ff69b4;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 0.6em 1.2em;
+            font-weight: bold;
+            transition: 0.3s ease-in-out;
+        }
+
+        .stButton > button:hover {
+            background-color: #ff1493;
+            transform: scale(1.05);
+        }
+
+        /* Section headers */
+        h1, h2, h3 {
+            color: #ff4b5c;
+        }
+
+        /* Wider layout for comfort */
+        .block-container {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+            padding-left: 3rem;
+            padding-right: 3rem;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+# Call the theme function right after page config
+set_fun_theme()
+
+
 # connect to rawdata s3 bucket
 BUCKET_NAME = 'ds4300rawdata'
 
