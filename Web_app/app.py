@@ -63,6 +63,7 @@ def load_data_from_rds():
 if st.button("load dashboard"):
     data = load_data_from_rds()
     if not data.empty:
+        # Global Category Visualizations
         st.subheader("Total Number of Products by Category")
         category_counts = data['category'].value_counts()
         st.bar_chart(category_counts)
@@ -74,37 +75,27 @@ if st.button("load dashboard"):
         st.subheader("Average Rating by Category")
         avg_rating = data.groupby('category')['rating'].mean().sort_values(ascending=False)
         st.line_chart(avg_rating)
-    else:
-        st.warning("no data available.")
 
-
-        # Dropdown for user to select a specific category
+        # 🔽 Individual Category Drilldown
         st.subheader("Explore Individual Category")
         unique_categories = sorted(data['category'].dropna().unique())
-
         selected_category = st.selectbox("Select a category to explore:", unique_categories)
 
         if selected_category:
             filtered = data[data['category'] == selected_category]
-
             st.write(f"Total products in '{selected_category}': {len(filtered)}")
 
-            # Average discount %
             avg_discount = filtered['discount_percentage'].mean()
             st.metric(label="Average Discount %", value=f"{avg_discount:.2%}" if pd.notna(avg_discount) else "N/A")
 
-            # Average rating
             avg_rating = filtered['rating'].mean()
             st.metric(label="Average Rating", value=f"{avg_rating:.2f}" if pd.notna(avg_rating) else "N/A")
 
-            # Top 5 products by rating
             st.subheader("Top 5 Rated Products")
             top_rated = filtered.sort_values(by='rating', ascending=False).head(5)[['product_name', 'rating']]
             st.dataframe(top_rated)
 
-            # Optional: Add histogram of discounts
             st.subheader("Discount Distribution")
             st.bar_chart(filtered['discount_percentage'].dropna())
-
-
-        
+    else:
+        st.warning("No data available.")
