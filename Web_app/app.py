@@ -51,7 +51,7 @@ def load_data_from_rds():
             database='sales-cleaned-db'
         )
         # read data from table into pandas dataframe
-        df = pd.read_sql("SELECT * FROM sales_data", conn)
+        df = pd.read_sql("SELECT * FROM products_cleaned", conn)
         conn.close()
         return df
     except Exception as e:
