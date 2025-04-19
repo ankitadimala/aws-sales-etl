@@ -84,8 +84,14 @@ if uploaded_file is not None:
 
         if st.button("Upload to S3"):
             uploaded_file.seek(0)
-            s3_client.upload_fileobj(uploaded_file, BUCKET_NAME, uploaded_file.name)
-            st.success(f"Uploaded {uploaded_file.name} to S3 bucket '{BUCKET_NAME}'")
+            
+            s3_key = f"uploads/{uploaded_file.name}"
+            s3_client.upload_fileobj(uploaded_file, BUCKET_NAME, s3_key)
+            st.success(f"Uploaded {uploaded_file.name} to S3 bucket '{BUCKET_NAME}' under 'uploads/'")
+           
+
+
+            
     except Exception as e:
         st.error(f"Could not read JSON file: {e}")
 
