@@ -5,6 +5,8 @@ import boto3
 import pymysql
 import json
 
+st.set_page_config(page_title="Amazon Sales Dashboard", layout="wide")
+
 def set_fun_theme():
     st.markdown(
         """
@@ -65,7 +67,6 @@ BUCKET_NAME = 'ds4300rawdata'
 s3_client = boto3.client('s3')
 
 # set the page title
-st.set_page_config(page_title="Amazon Sales Dashboard", layout="wide")
 st.title("Amazon Sales Transaction Dashboard YO")
 
 # section 1: upload json file to s3
